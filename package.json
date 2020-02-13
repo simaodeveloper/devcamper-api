@@ -1,0 +1,21 @@
+{
+  "name": "devcamper-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:simaodeveloper/devcamper-api.git",
+  "author": "Daniel Simão <simaodeveloper@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
