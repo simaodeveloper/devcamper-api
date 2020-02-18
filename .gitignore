@@ -105,3 +105,9 @@ dist
 
 # private folder/files
 config/
+
+# auxilias resources
+_aux/
+
+# data to feed database
+_data/
