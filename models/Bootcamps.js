@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import slugify from 'slugify';
+
+import geocoder from '../utils/geocoder';
 
 const MODEL_NAME = 'Bootcamp';
 
@@ -97,5 +100,47 @@ const BootcampSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// Middleware to set slug
+BootcampSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true })
+  next();
+});
+
+BootcampSchema.pre('save', async function (next) {
+  const location = await geocoder.geocode(this.address);
+
+  const {
+    longitude,
+    latitude,
+    formattedAddress,
+    city,
+    zipcode,
+    streetName: street,
+    stateCode: state,
+    countryCode: country
+  } = location[0];
+
+  this.location = {
+    street,
+    city,
+    state,
+    country,
+    zipcode,
+    formattedAddress,
+    type: 'Point',
+    coordinates: [
+      longitude,
+      latitude
+    ],
+  };
+
+  // Do not save address in DB
+  this.address = undefined;
+
+  next();
+});
+
+// Geocode & create location field
 
 export default mongoose.model(MODEL_NAME, BootcampSchema)
