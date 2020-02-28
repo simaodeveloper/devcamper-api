@@ -3,7 +3,7 @@ import asyncHandler from '../middlewares/async';
 import geocoder from '../utils/geocoder';
 import transformQueryConditional from '../utils/query';
 
-import Bootcamp from '../models/Bootcamps';
+import Bootcamp from '../models/Bootcamp';
 
 /**
  *
@@ -11,7 +11,6 @@ import Bootcamp from '../models/Bootcamps';
  * @route GET /api/v1/bootcamps
  * @access Public
  */
-
 export const getBootcamps = asyncHandler(async (req, res, next) => {
   let query = { ...req.query };
 
@@ -23,7 +22,7 @@ export const getBootcamps = asyncHandler(async (req, res, next) => {
   query = transformQueryConditional(query);
 
   // Find bootcamps based on mongoDB valid query
-  query = Bootcamp.find(query);
+  query = Bootcamp.find(query).populate('courses');
 
   // Apply Select Filter
   if (req.query.select) {
@@ -132,13 +131,15 @@ export const updateBootcamp = asyncHandler(async (req, res, next) => {
  * @access Private
  */
 export const deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndRemove(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
 
   if (!bootcamp) {
     return next(
       new ErrorResponse(`Bootcamp not found with the id: ${req.params.id}`, 404)
     );
   }
+
+  bootcamp.remove();
 
   res.status(200).json({ status: true, data: {} });
 });

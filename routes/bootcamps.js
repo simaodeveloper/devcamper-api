@@ -9,7 +9,13 @@ import {
   getBootcampsInRadius
 } from '../controllers/bootcamps';
 
+// Include other resource routers
+import courseRouter from './courses';
+
 const router = express.Router();
+
+// Re-route into other resource router
+router.use('/:bootcampId/courses', courseRouter);
 
 router
   .route('/radius/:zipcode/:distance')
