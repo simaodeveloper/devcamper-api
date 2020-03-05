@@ -1,9 +1,12 @@
 // Load env vars
 import './utils/envSetup';
 
+import path from 'path';
+
 import express from 'express';
 import colors from 'colors';
 import morgan from 'morgan';
+import fileUpload from 'express-fileupload';
 
 import errorHandler from './middlewares/error';
 
@@ -26,6 +29,12 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// File uploading
+app.use(fileUpload());
+
+// Set static folder
+app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps);

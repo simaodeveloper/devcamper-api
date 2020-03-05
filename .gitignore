@@ -108,6 +108,7 @@ config/
 
 # auxilias resources
 _aux/
+public/
 
 # data to feed database
 _data/

@@ -8,11 +8,20 @@ import {
   deleteCourse,
 } from '../controllers/courses';
 
+import Course from '../models/Course';
+import advancedResults from '../middlewares/advancedResults';
+
 const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(getCourses)
+  .get(
+    advancedResults(Course, {
+      path: 'bootcamp',
+      select: 'name description slug'
+    }),
+    getCourses
+  )
   .post(createCourse);
 
 router

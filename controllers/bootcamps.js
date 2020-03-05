@@ -1,7 +1,8 @@
+import path from 'path';
+
 import ErrorResponse from '../utils/ErrorResponse';
 import asyncHandler from '../middlewares/async';
 import geocoder from '../utils/geocoder';
-import transformQueryConditional from '../utils/query';
 
 import Bootcamp from '../models/Bootcamp';
 
@@ -12,66 +13,7 @@ import Bootcamp from '../models/Bootcamp';
  * @access Public
  */
 export const getBootcamps = asyncHandler(async (req, res, next) => {
-  let query = { ...req.query };
-
-  // Remove custom field to first search in DB
-  const filterFields = ['select', 'sort', 'page', 'limit'];
-
-  filterFields.forEach(filter => delete query[filter]);
-
-  query = transformQueryConditional(query);
-
-  // Find bootcamps based on mongoDB valid query
-  query = Bootcamp.find(query).populate('courses');
-
-  // Apply Select Filter
-  if (req.query.select) {
-    query = query.select(req.query.select.replace(',', ' '));
-  }
-
-  // Apply Sort Filter
-  if (req.query.sort) {
-    query = query.sort(req.query.sort.replace(',', ' '));
-  } else {
-    query = query.sort('-createdAt');
-  }
-
-  // Pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 1;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await Bootcamp.countDocuments();
-
-  // Ignore documents per page
-  query = query.skip(startIndex).limit(limit);
-
-  // Get result after all filters
-  const bootcamps = await query;
-
-  // Pagination result
-  const pagination = {};
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      limit,
-      page: page - 1,
-    };
-  }
-
-  if (endIndex < total) {
-    pagination.next = {
-      limit,
-      page: page + 1,
-    };
-  }
-
-  res.status(200).send({
-    pagination,
-    success: true,
-    count: bootcamps.length,
-    data: bootcamps
-  });
+  res.status(200).send(res.advancedResults);
 });
 
 /**
@@ -177,4 +119,66 @@ export const getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     count: bootcamps.length,
     data: bootcamps
   })
+});
+
+/**
+ *
+ * @description Upload photo for bootcamp
+ * @route PUT /api/v1/bootcamps/:id
+ * @access Private
+ */
+export const bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id);
+
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(`Bootcamp not found with the id: ${req.params.id}`, 404)
+    );
+  }
+
+  if (!req.files) {
+    return next(
+      new ErrorResponse(`Please upload a file`, 400)
+    );
+  }
+
+  const { file } = req.files;
+
+  // Make sure the image is a photo
+  if (!file.mimetype.startsWith('image')) {
+    return next(
+      new ErrorResponse(`Please upload a image file`, 400)
+    )
+  }
+
+  // Check filesize
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(`Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`, 400)
+    );
+  }
+
+  // Create custom filename
+  file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+  // Save file in a teporary folder
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+    if (err) {
+      console.log(err);
+      return next(
+        new ErrorResponse(`Problem with file upload`, 500)
+      );
+    }
+
+    await Bootcamp.findByIdAndUpdate(req.params.id, {
+      photo: file.name
+    });
+
+    res.status(200).json({
+      success: true,
+      data: file.name
+    });
+
+  });
+
 });
