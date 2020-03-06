@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 
+import bcrypt from 'bcryptjs';
+
 const MODEL_NAME = 'User';
 
-const BootcampSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please add a name']
@@ -35,4 +37,10 @@ const BootcampSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model(MODEL_NAME, BootcampSchema)
+UserSchema.pre('save', async function (next) {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+export default mongoose.model(MODEL_NAME, UserSchema)
