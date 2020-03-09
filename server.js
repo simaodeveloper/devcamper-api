@@ -6,6 +6,7 @@ import path from 'path';
 import express from 'express';
 import colors from 'colors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 
 import errorHandler from './middlewares/error';
@@ -25,6 +26,9 @@ const PORT = process.env.PORT || 5000;
 
 // Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
