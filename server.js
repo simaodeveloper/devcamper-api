@@ -3,8 +3,9 @@ import './utils/envSetup';
 
 import path from 'path';
 
+import 'colors';
+
 import express from 'express';
-import colors from 'colors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
@@ -16,6 +17,8 @@ import connectDB from './config/db';
 import bootcamps from './routes/bootcamps';
 import courses from './routes/courses';
 import auth from './routes/auth';
+import users from './routes/users';
+import reviews from './routes/reviews';
 
 // Connect with the DB
 connectDB();
@@ -45,6 +48,8 @@ app.use(express.static(path.resolve(process.cwd(), 'public')));
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', users);
+app.use('/api/v1/reviews', reviews);
 
 app.use(errorHandler);
 

@@ -86,7 +86,7 @@ export const createCourse = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data: course
-  })
+  });
 });
 
 /**
