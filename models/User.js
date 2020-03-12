@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import ErrorResponse from '../utils/ErrorResponse';
 
 const MODEL_NAME = 'User';
 
@@ -28,7 +29,7 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please add a password'],
-    minLength: 6,
+    minlength: 6,
     select: false
   },
   resetPasswordToken: String,
@@ -42,7 +43,7 @@ const UserSchema = new mongoose.Schema({
 // Encrypting Password
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);

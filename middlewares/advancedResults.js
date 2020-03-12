@@ -8,6 +8,7 @@ export default (model, populate) => async (req, res, next) => {
 
   filterFields.forEach(filter => delete query[filter]);
 
+  // make por example lt -> $lt to be valid in mongoose
   query = transformQueryConditional(query);
 
   // Find model based on mongoDB valid query
@@ -32,9 +33,13 @@ export default (model, populate) => async (req, res, next) => {
 
   // Pagination
   const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 1;
+  // Max quantity items per page
+  const limit = parseInt(req.query.limit, 10) || 25;
+  // Index to show items
   const startIndex = (page - 1) * limit;
+  // Quantity items displayed per page
   const endIndex = page * limit;
+
   const total = await model.countDocuments();
 
   // Ignore documents per page

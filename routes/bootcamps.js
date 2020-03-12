@@ -15,6 +15,7 @@ import advancedResults from '../middlewares/advancedResults';
 
 // Include other resource routers
 import courseRouter from './courses';
+import reviewRouter from './reviews';
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ import { protect, authorize } from '../middlewares/auth';
 
 // Re-route into other resource router
 router.use('/:bootcampId/courses', courseRouter);
+router.use('/:bootcampId/reviews', reviewRouter);
 
 router
   .route('/radius/:zipcode/:distance')
