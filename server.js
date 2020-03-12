@@ -82,7 +82,7 @@ app.use(errorHandler);
 
 const server = app.listen(
   process.env.PORT,
-  () => console.log(`Server running in ${process.env.NODE_ENV} mode on ${process.env.DOMAIN}:${PORT}`.yellow.bold)
+  () => console.log(`Server running in ${process.env.NODE_ENV} mode on PORT ${PORT}`.yellow.bold)
 );
 
 process.on('unhandledRejection', (err, promise) => {

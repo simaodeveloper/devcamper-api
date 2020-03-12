@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # private folder/files
-config/
+config/config.env
 
 # auxilias resources
 _aux/
